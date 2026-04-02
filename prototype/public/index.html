@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Moveworks AI Assistant — Demo</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div class="app">
+
+  <!-- LEFT PANEL: Employee Profile + Quick Actions -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="mw-logo">
+        <div class="mw-logo-mark">M</div>
+        <div class="mw-logo-text">
+          <span class="mw-name">moveworks</span>
+          <span class="mw-by">by ServiceNow</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="employee-card">
+      <div class="emp-avatar">JR</div>
+      <div class="emp-info">
+        <div class="emp-name">Jordan Rivera</div>
+        <div class="emp-role">Sr. Software Engineer</div>
+        <div class="emp-dept">Platform Engineering · Austin, TX</div>
+      </div>
+    </div>
+
+    <div class="quick-stats">
+      <div class="stat-item">
+        <div class="stat-label">PTO Balance</div>
+        <div class="stat-value green">12.5 days</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">Next RSU Cliff</div>
+        <div class="stat-value yellow">Apr 15, 2026</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">Open Tickets</div>
+        <div class="stat-value">None</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">Expense Report</div>
+        <div class="stat-value yellow">Pending</div>
+      </div>
+    </div>
+
+    <div class="quick-section-label">Try asking:</div>
+
+    <div class="scenario-group">
+      <div class="scenario-group-label">IT &amp; Access</div>
+      <button class="quick-btn it" onclick="sendQuick('I need access to Salesforce for a new cross-team project')">🔐 Request Salesforce access</button>
+      <button class="quick-btn it" onclick="sendQuick('My GitHub Actions runner is timing out and I think I need elevated AWS permissions to debug it')">⚙️ Debug GitHub Actions issue</button>
+    </div>
+
+    <div class="scenario-group">
+      <div class="scenario-group-label">HR &amp; Benefits</div>
+      <button class="quick-btn hr" onclick="sendQuick('I want to take a week off in late April for a family trip — can you check my PTO and submit the request?')">🌴 Request PTO</button>
+      <button class="quick-btn hr" onclick="sendQuick('What are the details on my RSU vesting schedule?')">📈 RSU vesting details</button>
+    </div>
+
+    <div class="scenario-group">
+      <div class="scenario-group-label">Agentic Workflows</div>
+      <button class="quick-btn agent" onclick="sendQuick('I\'m onboarding a new contractor, Alex Chen, who starts Monday. She needs access to GitHub, Confluence, Jira, and Zoom. Her email is alex.chen@contractor.meridian.com')">🚀 Onboard a contractor</button>
+      <button class="quick-btn agent" onclick="sendQuick('My expense report for Q1 was submitted last week — any update on approval?')">💳 Check expense approval</button>
+    </div>
+
+    <div class="scenario-group">
+      <div class="scenario-group-label">Knowledge</div>
+      <button class="quick-btn knowledge" onclick="sendQuick('What is the company policy on data retention for customer PII in our production databases?')">📋 Data retention policy</button>
+      <button class="quick-btn knowledge" onclick="sendQuick('How do I set up a new AWS account for my team\'s new microservice?')">☁️ New AWS account setup</button>
+    </div>
+  </aside>
+
+  <!-- CENTER PANEL: Chat -->
+  <main class="chat-panel">
+    <div class="chat-header">
+      <div class="chat-title">
+        <span class="assistant-dot"></span>
+        Moveworks AI Assistant
+      </div>
+      <div class="chat-subtitle">Powered by Core ML · Connected to 8 enterprise systems</div>
+    </div>
+
+    <div class="chat-messages" id="chatMessages">
+      <div class="message assistant">
+        <div class="msg-avatar">M</div>
+        <div class="msg-content">
+          <div class="msg-bubble">
+            Hi Jordan! I'm your Moveworks AI Assistant — connected to ServiceNow, Workday, Okta, Confluence, and all your enterprise systems.<br><br>
+            I can help you with IT requests, HR questions, access provisioning, policy lookups, and complex multi-step workflows — just ask in natural language.<br><br>
+            What do you need today?
+          </div>
+          <div class="msg-time">Now</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="chat-input-area">
+      <div class="input-row">
+        <textarea
+          id="chatInput"
+          placeholder="Ask anything — IT issue, HR question, request access, look up a policy..."
+          rows="1"
+          onkeydown="handleKeyDown(event)"
+          oninput="autoResize(this)"
+        ></textarea>
+        <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+          </svg>
+        </button>
+      </div>
+      <div class="input-footer">Press <kbd>Enter</kbd> to send · <kbd>Shift+Enter</kbd> for newline</div>
+    </div>
+  </main>
+
+  <!-- RIGHT PANEL: ML Intelligence -->
+  <aside class="intel-panel">
+    <div class="intel-header"
+      data-tooltip="Real-time analysis of every AI decision — how the model understood your request, what reasoning it applied, and which enterprise systems it accessed.">
+      AI Intelligence Layer
+    </div>
+    <div class="intel-subheader"
+      data-tooltip="All signals are computed live during inference. Values update after each message.">
+      Core ML · Real-time analysis
+    </div>
+
+    <!-- Intent Classification -->
+    <div class="intel-section">
+      <div class="intel-section-title"
+        data-tooltip="The NLU pipeline maps natural language to a structured enterprise intent category. Moveworks targets >95% classification accuracy across IT, HR, Finance, and Operations domains.">
+        Intent Classification
+      </div>
+      <div class="intel-placeholder" id="intentDisplay"
+        data-tooltip="The specific intent label detected for this query. More precise labels enable more accurate action routing and system selection.">
+        <span class="placeholder-text">Waiting for query...</span>
+      </div>
+    </div>
+
+    <!-- ML Metrics -->
+    <div class="intel-section">
+      <div class="intel-section-title"
+        data-tooltip="Core quality signals from the ML inference pipeline. These metrics drive autonomous vs. human-escalation decisions for every request.">
+        ML Metrics
+      </div>
+      <div class="metrics-grid" id="metricsGrid">
+        <div class="metric-card"
+          data-tooltip="Model certainty about its intent classification. ≥90% → autonomous execution. 75–89% → confirmation step before action. &lt;75% → route to human agent.">
+          <div class="metric-label">Confidence</div>
+          <div class="metric-value" id="metConfidence">—</div>
+          <div class="metric-bar-wrap"><div class="metric-bar" id="barConfidence" style="width:0%"></div></div>
+        </div>
+        <div class="metric-card"
+          data-tooltip="Composite score measuring semantic comprehension: entity extraction accuracy, context retention from prior turns, and ambiguity resolution quality. Target: >88/100.">
+          <div class="metric-label">Understanding</div>
+          <div class="metric-value" id="metUnderstanding">—</div>
+          <div class="metric-bar-wrap"><div class="metric-bar" id="barUnderstanding" style="width:0%"></div></div>
+        </div>
+        <div class="metric-card"
+          data-tooltip="Number of enterprise knowledge documents retrieved from the RAG layer to ground this response. Higher count = richer context. 0 = answer derived purely from model weights (no retrieval needed).">
+          <div class="metric-label">Retrieval Hits</div>
+          <div class="metric-value" id="metRetrieval">—</div>
+        </div>
+        <div class="metric-card"
+          data-tooltip="Execution mode: 'autonomous' = AI acts immediately without confirmation. 'confirmation required' = AI proposes action and waits for approval. 'human escalation' = request routed to a human agent with full context pre-populated.">
+          <div class="metric-label">Action Type</div>
+          <div class="metric-value small" id="metActionType">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reasoning Steps -->
+    <div class="intel-section">
+      <div class="intel-section-title"
+        data-tooltip="Step-by-step trace of the agentic ReAct loop — how the model decomposed the employee's goal, selected tools, and determined the sequence of actions to take.">
+        Reasoning Trace
+      </div>
+      <div class="reasoning-steps" id="reasoningSteps">
+        <div class="reasoning-placeholder">Agentic reasoning steps will appear here after each query.</div>
+      </div>
+    </div>
+
+    <!-- Systems Accessed -->
+    <div class="intel-section">
+      <div class="intel-section-title"
+        data-tooltip="Enterprise systems queried or modified during this request. Each card shows the system name, operation type, result summary, and API round-trip latency in milliseconds.">
+        Systems Accessed
+      </div>
+      <div class="systems-list" id="systemsList">
+        <div class="systems-placeholder">Enterprise system calls will appear here.</div>
+      </div>
+    </div>
+
+    <!-- Safety Panel -->
+    <div class="intel-section">
+      <div class="intel-section-title"
+        data-tooltip="Four guardrail checks run in parallel with every inference. All must pass before a response is delivered. Any flag triggers a safe-response handler instead of the primary pipeline.">
+        Safety &amp; Compliance
+      </div>
+      <div class="safety-panel" id="safetyPanel">
+        <div class="safety-item ok" id="safetyPII"
+          data-tooltip="Scans both the employee's request and the AI's response for PII — SSNs, medical data, financial account numbers, passwords. Flags content for redaction before it is logged or transmitted.">
+          <span class="safety-icon">✓</span>
+          <span>PII Detection</span>
+          <span class="safety-status">Clean</span>
+        </div>
+        <div class="safety-item ok" id="safetyAuth"
+          data-tooltip="Verifies Jordan's Okta role and ServiceNow RBAC policies permit the requested action. Requests exceeding the employee's access level are blocked and escalated — never silently allowed.">
+          <span class="safety-icon">✓</span>
+          <span>Authorization Check</span>
+          <span class="safety-status">Passed</span>
+        </div>
+        <div class="safety-item ok" id="safetyPrompt"
+          data-tooltip="Detects adversarial inputs: prompt injection attacks, jailbreak attempts, system prompt extraction, and policy-violating requests. Flagged inputs are routed to a safe-response handler, not the primary model.">
+          <span class="safety-icon">✓</span>
+          <span>Prompt Safety</span>
+          <span class="safety-status">Clean</span>
+        </div>
+        <div class="safety-item ok" id="safetyAudit"
+          data-tooltip="Every action is immutably logged with full provenance: employee ID, timestamp, systems accessed, tool calls made, and response generated. Logs are exportable to enterprise SIEM for compliance review.">
+          <span class="safety-icon">✓</span>
+          <span>Audit Logged</span>
+          <span class="safety-status">Yes</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
